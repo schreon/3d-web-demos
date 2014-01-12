@@ -1,0 +1,61 @@
+<!-- 
+
+  Leon Schroeder
+  ls066@hdm-stuttgart.de
+
+-->
+<html>
+    <head>
+        <title>3D Web Demo - Mini Death Stars</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+        <style>
+
+          body {
+            background: #000000;
+            -webkit-user-select: none; /* Chrome/Safari */        
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+
+            /* Rules below not implemented in browsers yet */
+            -o-user-select: none;
+            user-select: none;
+          }
+          canvas {
+            border : 10px solid white !important;
+            margin-top:20px;
+          }
+        </style>
+    </head>
+    <body>
+
+    <center>
+        <canvas id="minideathstars" style="border: 2px solid blue" width="1000" height="500"></canvas> </br>
+
+        <button type="button" class="btn btn-primary" onclick="addRandomMiniDeathStar()">
+          Add Mini Death Star
+        </button>
+        <button type="button" class="btn btn-danger" onclick="removeRandomMiniDeathStar()">
+          Destroy Mini Death Star
+        </button>
+
+    </center>
+
+    <script type="application/javascript" src="canvas3dapi/c3dapi.js" ></script>
+    <script type="application/javascript" src="deathstars.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>    
+    <script>
+      $("body").mousedown(function(e){
+        mouseDown(e);
+      });
+      $("body").mouseup(function(e){
+        mouseUp(e);
+      });
+      $("body").mousemove(function(e){
+        mouseMove(e);
+      });
+    </script>
+    </body>
+</html>
