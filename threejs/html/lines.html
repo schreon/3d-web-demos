@@ -1,0 +1,144 @@
+<!DOCTYPE html><html><head><title>.: spring physics :.</title>
+<style>
+body { background: #000; color: #aaa;}
+</style>
+</head>
+<body>
+  <!-- TODO -->
+<!-- scripts -->
+<script type="text/javascript" src="../js/springphysics.js"></script>
+<script type="text/javascript" src="../js/three.min.js"></script>
+<!-- custom script -->
+<script type="text/javascript">
+  // Array Remove - By John Resig (MIT Licensed)
+  Array.prototype.remove = function(from, to) {
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+  };
+
+  /* ****************** */
+  /* SIMULATION STATE   */
+  var nodesPosX, nodesPosY, velNormX, velNormY, accNormX, accNormY;
+  var numIndividuals = 50,
+   numNodesPerIndividual = 1,
+    radius=25;
+  var running = true;
+
+  var spController = SpringPhysicsController.create("../js/");
+  /* ****************** */
+
+  /* ****************** */
+  /* VIEW ELEMENTS   */
+  var nodes=[], linesVel=[], linesAcc=[];
+  var camera, scene, renderer;
+  /* ****************** */
+
+  function init() {
+    var w = window.innerWidth / 2;
+    var h = window.innerHeight / 2;
+    camera = new THREE.OrthographicCamera(-w, w, -h, h, 1, 10000 );
+    camera.position.set(0, 0, 100);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    scene = new THREE.Scene();
+
+    /* **************************** */
+
+    // Center circle
+      var material = new THREE.LineBasicMaterial({
+          color: 0xFF0000,
+      });
+        var geometry = new THREE.CircleGeometry(1,20);
+      var circle = new THREE.Line(geometry, material);
+      circle.position.x=-1;
+      circle.position.y=-1;
+      circle.position.z=0;
+      scene.add(circle);
+
+    /* **************************** */
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    document.body.appendChild( renderer.domElement );
+  }
+
+  /* ******** */
+  spController.onInitFinished = function(newNodesPosX, newNodesPosY){
+    nodesPosX = newNodesPosX;
+    nodesPosY = newNodesPosY;
+    // Just initialized ...
+    velNormX = newNodesPosX;
+    velNormY = newNodesPosY;
+    accNormX = newNodesPosX;
+    accNormY =  newNodesPosY;
+
+    init(); // Trigger view init
+
+    /* ADD VIEW ELEMENTS */
+    var material = new THREE.LineBasicMaterial({
+        color: 0xFFFF00
+    });
+
+    var velMterial = new THREE.LineBasicMaterial({
+        color: 0x00FF00
+    });
+
+    for (var i=0; i < newNodesPosX.length; i++){
+      var geometry = new THREE.CircleGeometry(radius,20);
+      var circle = new THREE.Line(geometry, material);
+      circle.position.x=newNodesPosX[i];
+      circle.position.y=newNodesPosY[i];
+      circle.position.z=0;
+      scene.add(circle);
+      nodes.push(circle);
+
+      // Velocity vector
+      var geometry = new THREE.Geometry();
+      geometry.dynamic = true;
+      geometry.vertices.push(new THREE.Vector3(nodesPosX[i], nodesPosY[i], 0));
+      geometry.vertices.push(new THREE.Vector3(velNormX[i], velNormY[i], 0));      
+      var line = new THREE.Line(geometry, velMterial);
+      scene.add(line);
+      linesVel.push(line);
+    }
+
+    console.log("onInitFinished");
+
+    renderer.render( scene, camera );
+    spController.doUpdate(); // Trigger first update
+  };
+
+  spController.onUpdate = function(newNodesPosX, newNodesPosY, collisions
+                                    ,pvelNormX, pvelNormY, paccNormX, paccNormY){
+
+    /* SCENE UPDATES */
+    if(running) spController.doUpdate(); // trigger next update
+
+    /* SIMULATION STATE UPDATES */
+    nodesPosX = newNodesPosX;
+    nodesPosY = newNodesPosY;    
+    velNormX = pvelNormX;
+    velNormY = pvelNormY;
+    accNormX = paccNormX;
+    accNormY = paccNormY;
+
+    /* VIEW UPDATES */
+    for(var i=0; i < newNodesPosX.length; i++) {
+      nodes[i].position.x = nodesPosX[i];
+      nodes[i].position.y = nodesPosY[i];
+      linesVel[i].geometry.vertices[0].x = nodesPosX[i];
+      linesVel[i].geometry.vertices[0].y = nodesPosY[i];
+      linesVel[i].geometry.vertices[1].x = velNormX[i];
+      linesVel[i].geometry.vertices[1].y = velNormY[i];
+      linesVel[i].geometry.verticesNeedUpdate = true;
+
+    }
+
+    renderer.render( scene, camera );
+  };
+
+  spController.init(numIndividuals, numNodesPerIndividual, radius);
+  </script>
+</body>
+</html>

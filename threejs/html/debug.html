@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><title>.: spring physics :.</title>
+<style>
+body { background: #000; color: #aaa;}
+</style>
+</head>
+<body>
+  <!-- TODO -->
+<!-- scripts -->
+<script type="text/javascript" src="../js/controller.js"></script>
+<script type="text/javascript" src="../js/debugview.js"></script>
+<script type="text/javascript" src="../js/three.min.js"></script>
+<!-- custom script -->
+<script type="text/javascript">
+  // Array Remove - By John Resig (MIT Licensed)
+  Array.prototype.remove = function(from, to) {
+    var rest = this.slice((to || from) + 1 || this.length);
+    this.length = from < 0 ? this.length + from : from;
+    return this.push.apply(this, rest);
+  };
+
+  var fieldWidth = 800;
+  var fieldHeight = 400;
+
+  var controller = PhysicsController.create("../js/");
+  var view;
+
+
+  /* ****************** */
+
+  /* ******** */
+  controller.onInitFinished = function(fieldWidth, fieldHeight, posX, posY, radii, debugInfo){
+    /* TODO:  new parameters*/
+    view = PhysicsView.create(fieldWidth, fieldHeight);
+    view.createCircles(posX, posY, radii, debugInfo);
+    view.refresh();
+    view.onclick = function(){
+      controller.doNextStep();
+    }
+    
+    animate(); // Start update loop
+  };
+
+  // TODO: new parameters
+  controller.onUpdate = function(posX, posY, radii, debugInfo){
+    /* TODO: VIEW UPDATES */
+    view.updateCircles(posX, posY, radii, debugInfo);
+    view.refresh();
+  };
+
+  function animate(){
+    requestAnimationFrame( animate );
+
+    controller.doUpdate();
+  }
+
+
+  controller.init();
+  </script>
+</body>
+</html>

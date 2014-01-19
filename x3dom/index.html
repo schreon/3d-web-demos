@@ -1,0 +1,85 @@
+<!-- 
+
+  Leon Schroeder
+  ls066@hdm-stuttgart.de
+
+-->
+<html ng-app="x3domdemo">
+  <head>
+    <title>X3DOM Demo - Flickr search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+
+
+    <style>
+      html {
+        width : 100%;
+        border : 0;
+        margin : 0;
+        padding : 0;
+      }
+
+      body {
+        width : 100%;
+        border : 0;
+        margin : 0;
+        padding : 0;
+        zoom: 1;
+      }
+
+      canvas {
+        position:absolute;
+        width : 100%;
+        height : 100%;
+        border : 0;
+        margin:0;
+        padding:0;
+      }
+
+    </style>
+
+  </head>
+<body  ng-controller="StatusConroller" id="ctl">
+    <x3d id="x3dom_canvas">
+      <scene>
+        <transform translation="{{ item.x }} {{ item.y }} {{ item.z }}" ng-repeat="item in data.items">
+          <shape>
+            <appearance>
+              <material diffuseColor='red'></material>
+              <imageTexture url='/proxy/?url={{item.media.m}}'></imageTexture>
+            </appearance>
+            <Rectangle2D size='1 1' subdivision='1 1' onclick="details(this);"></Rectangle2D>
+          </shape>
+        </transform>
+      </scene>
+    </x3d>
+    <div class="container">
+      <div class="row">
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container">
+          <a class="navbar-brand" href="#">Flickr search:</a>
+          <form class="navbar-form navbar-left">
+            <div class="form-group">
+              <input class="form-control " type="text" ng-model="search"></input>
+            </div>
+            <button class="btn btn-default" ng-click="dosearch()">Search</button>
+          </form>
+          <ul class="nav navbar-nav">
+              <li><a href="https://github.com/schreon/3d-web-demos/tree/master/x3dom">About</a></li>
+          </ul>
+        </div>
+        </nav>
+      </div>
+    </div>
+    <hr/>
+    <!-- <img ng-repeat="item in data.items" ng-src="/proxy/?url={{item.media.m}}"/> -->
+    <!-- Loading Scripts at the end of body makes the webpage load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-resource.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.9.0/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="http://www.x3dom.org/download/x3dom.js"></script>
+    <script type="text/javascript" src="http://www.x3dom.org/download/dev/components/Geometry2D.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
