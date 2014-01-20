@@ -140,23 +140,6 @@ PhysicsView.create = function(field_width, field_height){
   } );
 
 
-  self.green_uniforms = {
-    fogDensity: { type: "f", value: 0.91 },
-    fogColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-    time: { type: "f", value: 1.0 },
-    resolution: { type: "v2", value: new THREE.Vector2() },
-    uvScale: { type: "v2", value: new THREE.Vector2( 0.5, 1.0 ) },
-    texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "../img/cloud.png" ) },
-    texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "../img/greentile.jpg" ) }
-  };
-  self.green_uniforms.texture1.value.wrapS = self.green_uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
-  self.green_uniforms.texture2.value.wrapS = self.green_uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
-  
-  self.greenMaterial = new THREE.ShaderMaterial( {
-    uniforms: self.green_uniforms,
-    vertexShader: document.getElementById( 'vertexShader' ).textContent,
-    fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-  } );
 
   // FLOOR
   var floorTexture = new THREE.ImageUtils.loadTexture( '../img/universe.jpg' );
