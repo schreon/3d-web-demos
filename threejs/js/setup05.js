@@ -1,9 +1,9 @@
 var fieldWidth  = 800;
 var fieldHeight = 800;
 
-var numBodies   = 401;
-var minRadius   = 20;
-var maxRadius   = 20;
+var numBodies   = 65;
+var minRadius   = 40;
+var maxRadius   = 40;
 
 var wallLeft = -fieldWidth/2;
 var wallTop = fieldHeight/2;
@@ -43,12 +43,12 @@ function customInit(){
   velX = new Float64Array(numBodies);
   velY = new Float64Array(numBodies);
 
-  createGrid(20, 10, 4);
+  createGrid(8, 20, 8);
 
   //velY[0] = 50000;
   //velX[0] = 50000;
 
-  radii[numBodies-1] = 32;
+  radii[numBodies-1] = 64;
 
   posX[numBodies-1] = 0;
   posY[numBodies-1] = wallTop-radii[numBodies-1];

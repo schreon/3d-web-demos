@@ -61,57 +61,18 @@ PhysicsView.create = function(field_width, field_height){
   self.camera.position.set(0, 0, 100);
   self.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  //self.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   self.scene = new THREE.Scene();
 
   /* **************************** */
   self.bodies = [];
 
-  // create a point light
-  // var pointLight =
-  //   new THREE.PointLight(0xFFFFFF, 1.0);
-
-  // // set its position
-  // pointLight.position.x = 0;
-  // pointLight.position.y = 0;
-  // pointLight.position.z = 4;
-
-  // // add to the scene
-  // self.scene.add(pointLight);
-
-  // plane
-  // var texture = THREE.ImageUtils.loadTexture( "wall1b.jpg" );
-
-  // // assuming you want the texture to repeat in both directions:
-  // texture.wrapS = THREE.RepeatWrapping; 
-  // texture.wrapT = THREE.RepeatWrapping;
-
-  // // how many times to repeat in each direction; the default is (1,1),
-  // //   which is probably why your example wasn't working
-  // texture.repeat.set( 4, 4 ); 
-
-  // var plane = new THREE.Mesh(new THREE.PlaneGeometry(field_width, field_height, 32, 32),
-  //  new THREE.MeshLambertMaterial({
-  //     color: 0xffffff,
-  //     ambient: 0xffffff,
-  //     map : texture
-  // }));
-  // //plane.overdraw = true;
-  // plane.material.side = THREE.DoubleSide;
-  // plane.rotation.x = 0;
-  // plane.position.x = 0;
-  // plane.position.y = 0;
-  // plane.position.z = 0;
-  
-  // self.scene.add(plane);
-
   self.delta = 0.0;
 
   /* **************************** */
   self.renderer = new THREE.WebGLRenderer({antialias:true});
   self.renderer.setSize( window.innerWidth, window.innerHeight );
-
+  //self.renderer.setClearColorHex( 0xffffff, 1 );
   document.body.appendChild( self.renderer.domElement );
   self.renderer.domElement.onclick = function(){
     if(self.onclick != undefined){
@@ -120,6 +81,8 @@ PhysicsView.create = function(field_width, field_height){
     }
   }
   self.renderer.autoClear = false;
+  self.renderer.shadowMapEnabled = true;
+  self.renderer.shadowMapSoft = true;
 
   self.stats = new Stats();
   self.stats.domElement.style.position = 'absolute';
@@ -137,6 +100,7 @@ PhysicsView.create = function(field_width, field_height){
   self.composer.addPass( self.renderModel );
   self.composer.addPass( self.effectBloom );
   self.composer.addPass( self.effectFilm );
+
 
   self.uniforms = {
     fogDensity: { type: "f", value: 0.45 },
@@ -164,7 +128,7 @@ PhysicsView.create = function(field_width, field_height){
     resolution: { type: "v2", value: new THREE.Vector2() },
     uvScale: { type: "v2", value: new THREE.Vector2( 0.5, 1.0 ) },
     texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "../img/cloud.png" ) },
-    texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "../img/viotile.jpg" ) }
+    texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "../img/earth.jpg" ) }
   };
   self.blue_uniforms.texture1.value.wrapS = self.blue_uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
   self.blue_uniforms.texture2.value.wrapS = self.blue_uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
@@ -193,6 +157,32 @@ PhysicsView.create = function(field_width, field_height){
     vertexShader: document.getElementById( 'vertexShader' ).textContent,
     fragmentShader: document.getElementById( 'fragmentShader' ).textContent
   } );
+
+  // FLOOR
+  var floorTexture = new THREE.ImageUtils.loadTexture( '../img/universe.jpg' );
+  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+  floorTexture.repeat.set( 1, 1 );
+  var floorMaterial = new THREE.MeshLambertMaterial( { map: floorTexture } );
+  floorMaterial.side = THREE.DoubleSide;
+  var floorGeometry = new THREE.PlaneGeometry(1952, 1300, 10, 10);
+  var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  floor.position.y = 0;
+  floor.receiveShadow = true;
+  floor.castShadow = true;
+  self.scene.add(floor);
+
+  // Light
+
+var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(-300, -300, 400);
+    directionalLight.castShadow = true;
+    //directionalLight.shadowOnly = true;
+    directionalLight.shadowDarkness = 0.9;
+    self.scene.add(directionalLight);
+
+  // add subtle ambient lighting
+  var ambientLight = new THREE.AmbientLight(0x333333);
+  self.scene.add(ambientLight);
 
   // ...
   // line pointing to mouse
@@ -240,11 +230,13 @@ PhysicsView.createCircles = function(posX, posY, radii){
   var self=this;
   self.smallRadius = radii[0];
   var rcolor = new RColor();
-  var smallGeometry =  new THREE.SphereGeometry(radii[0],8,8);
+  var smallGeometry =  new THREE.SphereGeometry(radii[0],64,64);
   var bigGeometry =  new THREE.SphereGeometry(radii[radii.length-1],128,128);
   for(var i=0; i < posX.length-1; i++){
     var col = rcolor.get(true);
       var circle = new THREE.Mesh(smallGeometry, self.blueMaterial);
+      circle.receiveShadow = true;
+      circle.castShadow = true;
       circle.position.x=posX[i];
       circle.position.y=-posY[i];
       circle.position.z=radii[i];
@@ -255,6 +247,8 @@ PhysicsView.createCircles = function(posX, posY, radii){
 
   // last one
   var circle = new THREE.Mesh(bigGeometry, self.lavaMaterial);
+  circle.receiveShadow = true;
+  circle.castShadow = true;
   circle.position.x=posX[radii.length-1];
   circle.position.y=-posY[radii.length-1];
   circle.position.z=radii[radii.length-1];
@@ -282,22 +276,14 @@ PhysicsView.updateCircles = function(posX, posY, radii){
 
 PhysicsView.createCollisionDummy = function(existsCollision, colliderA, colliderB, colPosX, colPosY, colNormX, colNormY, newVelXA, newVelYA, newVelXB, newVelYB){
   var self=this;
-  // TODO: initialize fields
 }
 
 PhysicsView.updateCollision = function(existsCollision, colliderA, colliderB, colPosX, colPosY, colNormX, colNormY, newVelXA, newVelYA, newVelXB, newVelYB){
   var self=this;
-  // TODO: show/hide collision view elements depending on existsCollision
-  // TODO: update collision view elements
-  // TODO: color colliders differently
 }
 
 PhysicsView.refresh= function(){
   var self=this;
-
-  //self.camera.lookAt(self.bodies[0]);
-  //self.renderer.clear();
-  //self.renderer.render( self.scene, self.camera );
 }
 
 PhysicsView.createText = function(text, x, y, material){
